@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -23,15 +23,41 @@ export class ProductsService {
     return this.prisma.product.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number) {
+    const product = await this.prisma.product.findUnique({where:{id}})
+    return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, updateProductDto: UpdateProductDto, userId:number) {
+    const product = await this.prisma.product.findUnique({where:{id}}) 
+    if(!product) throw new NotFoundException('Product not Found!')
+
+    if(product.authorId !== userId) throw new ForbiddenException('You are not the author of this product')
+    
+    return this.prisma.product.update({
+      where:{id},
+      data:{
+        ...updateProductDto,
+      }
+    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(productId: number, userId:number) {
+  const product = await this.prisma.product.findUnique({
+    where: { id: productId }
+  });
+
+  if (!product) {
+    throw new NotFoundException(`Product #${productId} not found`);
+  }
+
+  if (product.authorId !== userId) {
+    throw new ForbiddenException('You are not the author of this product');
+  }
+
+  await this.prisma.product.delete({
+    where: { id: productId }
+  });
+  return product;
   }
 }
