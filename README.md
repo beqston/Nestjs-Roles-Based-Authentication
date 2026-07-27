@@ -97,3 +97,34 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 # Nestjs-Roles-Based-Authentication
+
+
+## 🔐 Role-Based Authentication (NestJS)
+
+A secure, scalable authentication and authorization system built with **NestJS**, implementing **Role-Based Access Control (RBAC)**. This project handles user authentication using JWT and restricts access to specific routes/resources based on user roles (e.g., Admin, User, Moderator).
+
+### Features
+
+- ✅ User registration & login with hashed passwords (bcrypt)
+- ✅ JWT-based authentication (Access & Refresh tokens)
+- ✅ Role-based route protection using custom Guards & Decorators
+- ✅ `@Roles()` decorator for defining required roles per route
+- ✅ `RolesGuard` to validate user permissions
+- ✅ Passport.js integration (Local & JWT strategies)
+- ✅ Protected and public route handling
+- ✅ Modular, scalable NestJS architecture
+
+### Tech Stack
+
+- **Framework:** NestJS
+- **Authentication:** Passport.js, JWT
+- **Database:** (e.g., PostgreSQL / MongoDB — update as needed)
+- **ORM:** (e.g., TypeORM / Prisma / Mongoose — update as needed)
+- **Password Hashing:** bcrypt
+
+### How It Works
+
+1. Users register/login and receive a JWT token upon successful authentication.
+2. Each user is assigned a role (e.g., `admin`, `user`).
+3. Protected routes use the `@Roles()` decorator to specify which roles can access them.
+4. The `RolesGuard` checks the authenticated user's role against the required roles before allowing access.
