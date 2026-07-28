@@ -11,11 +11,11 @@ datasource db {
 }
 
 
-enum Role{
-  user
-  moderator
-  manager
-  admin
+enum Role {
+  ADMIN
+  MANAGER
+  MODERATOR
+  USER
 }
 
 model User {
@@ -25,7 +25,7 @@ model User {
   password       String
   refresh_token  String?
   products       Product[]
-  role           Role         @default(user)
+  role           Role         @default(USER)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 }
