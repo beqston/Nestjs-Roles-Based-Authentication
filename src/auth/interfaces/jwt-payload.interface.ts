@@ -1,6 +1,6 @@
 // create types of jwt tpayload
 export interface JwtPayload {
-    sub:string,
+    sub:number,
     email:string,
     role:string,
     iat?:number,

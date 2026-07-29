@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe, Patch } from 
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
 
 @Controller({path:'users', version:'1'})
 export class UsersController {
@@ -30,5 +31,10 @@ export class UsersController {
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id:number, @Body() data:UpdateUserDto){
     return this.usersService.update(id, data)
+  }
+
+  @Post('logout')
+  logout(@GetUser('id') id:number){
+    return this.usersService.logout(id)
   }
 }

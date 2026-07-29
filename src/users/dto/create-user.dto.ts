@@ -12,5 +12,8 @@ export class CreateUserDto {
     @IsNotEmpty()
     @IsString()
     password!:string
+
+
+    refresh_token?:string | null
 }
 
