@@ -2,14 +2,20 @@ import { Injectable } from "@nestjs/common";
 import {PassportStrategy} from '@nestjs/passport'
 import {ExtractJwt, Strategy} from 'passport-jwt'
 import { JwtPayload } from "../interfaces/jwt-payload.interface";
+import { Request } from "express";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy){
    constructor(){
+    const secret = process.env.SECRET_KEY 
+    if(!secret) throw new Error('Please provide SECRET_KEY')
     super({
-        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        jwtFromRequest: ExtractJwt.fromExtractors([
+            (req:Request)=> req.cookies?.access_token || null,
+            ExtractJwt.fromAuthHeaderAsBearerToken()
+        ]),
         ignoreExpiration:false,
-        secretOrKey:process.env.SECRET_KEY || 'nest'
+        secretOrKey:secret
     })
    }
 
