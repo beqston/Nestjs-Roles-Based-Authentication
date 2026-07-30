@@ -47,9 +47,5 @@ export class UsersService {
   async findById(id: number) {
     return this.prisma.user.findUnique({ where: { id } });
   }
-
-  async logout(id:number){
-    await this.update(id, { refresh_token:null });
-  }
 }
 

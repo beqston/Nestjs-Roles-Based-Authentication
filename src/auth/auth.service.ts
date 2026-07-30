@@ -9,12 +9,12 @@ import bcrypt from 'bcrypt'
 export class AuthService {
   constructor(
     private prisma:PrismaService,
-    private jwtService:JwtService
+    private jwtService:JwtService,
   ){}
   async login(user:Omit<User, 'password'>) {
     const payload = {sub:user.id, email:user.email, role:user.role}
     
-    const token = this.jwtService.sign(payload, {expiresIn:'20m'})
+    const token = await this.jwtService.signAsync(payload, {expiresIn:'20m'})
   
     const refreshToken = crypto.randomBytes(32).toString('hex')
     const hashedrefreshToken = await bcrypt.hash(refreshToken, 10)
@@ -29,12 +29,14 @@ export class AuthService {
     })
 
     return{
-      id:user.id,
-      email:user.email,
-      username:user.username,
-      role: user.role,
+      user:{
+        id:user.id,
+        email:user.email,
+        username:user.username,
+        role: user.role,
+      },
       access_token:token,
-      refresh_token: hashedrefreshToken
+      refresh_token: refreshToken
     }
   }
 
@@ -72,6 +74,9 @@ export class AuthService {
     access_token: newAccessToken,
   };
   
+  }
+  async logout(id:number){
+    await this.prisma.user.update({where:{id}, data:{refresh_token:null}})
   }
 }
 
