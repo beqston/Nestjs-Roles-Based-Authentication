@@ -34,11 +34,9 @@ export class AuthController {
 
   @Post('refresh')
   @UseGuards(JwtRefreshGuard)
-  async refresh(@Request() req:ExpressRequest){
+  async refresh(@GetUser() user:{id:number, refresh_token:string}){
 
-    const userId = (req as any).user.id
-    const refreshToken = (req as any).user.refresh_token
-    return this.authService.refreshToken(userId, refreshToken)
+    return this.authService.refreshToken(user.id, user.refresh_token)
   }
 
   @Post('logout')

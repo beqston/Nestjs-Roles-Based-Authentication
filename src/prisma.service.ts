@@ -5,10 +5,10 @@ import { PrismaClient } from '@prisma/client';
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy{
 
     async onModuleInit() {
-        return await this.$connect()
+        return this.$connect()
     }
 
     async onModuleDestroy() {
-        return await this.$disconnect()
+        return this.$disconnect()
     }
 }

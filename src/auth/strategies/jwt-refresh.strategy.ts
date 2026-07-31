@@ -14,6 +14,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     if(!secret) throw new Error('JWT_REFRESH_SECRET environment variable is not defined');
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
+        (req:Request)=>req.cookies?.access_token || null,
         ExtractJwt.fromAuthHeaderAsBearerToken(),
         ExtractJwt.fromBodyField('refreshToken')
       ]),
@@ -28,7 +29,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     const refreshToken = req.get('Authorization')?.replace(/^Bearer\s+/i, '').trim()  || req.body?.refreshToken;
     if(!refreshToken)  throw new UnauthorizedException('Refresh token not provided');
 
-     const user = await this.userService.findById(+payload.sub);
+     const user = await this.userService.findById(payload.sub);
      if(!user || !user.refresh_token) throw new UnauthorizedException('Access denied');
      const isMatch = await bcrypt.compare(refreshToken, user.refresh_token)
      if(!isMatch) throw new UnauthorizedException('Invalid refresh token')
