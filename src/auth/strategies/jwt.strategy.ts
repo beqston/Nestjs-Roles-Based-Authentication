@@ -7,15 +7,13 @@ import { Request } from "express";
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy){
    constructor(){
-    const secret = process.env.SECRET_KEY 
-    if(!secret) throw new Error('Please provide SECRET_KEY')
     super({
         jwtFromRequest: ExtractJwt.fromExtractors([
             (req:Request)=> req.cookies?.access_token || null,
             ExtractJwt.fromAuthHeaderAsBearerToken()
         ]),
         ignoreExpiration:false,
-        secretOrKey:secret
+        secretOrKey:'nest'
     })
    }
 
