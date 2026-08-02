@@ -5,6 +5,8 @@ import { PrismaService } from 'src/prisma.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategies/local.strategy';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { UsersService } from 'src/users/users.service';
 
 @Module({
   imports:[
@@ -17,6 +19,6 @@ import { LocalStrategy } from './strategies/local.strategy';
     })
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, LocalStrategy],
+  providers: [AuthService, PrismaService, LocalStrategy, JwtRefreshStrategy, UsersService],
 })
 export class AuthModule {}

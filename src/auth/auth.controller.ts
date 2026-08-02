@@ -15,6 +15,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   async login(@Request() req: ExpressRequest, @Response({passthrough:true}) res:ExpressResponse) {
     const {user, access_token, refresh_token} = await this.authService.login(req.user as Omit<User, 'password'>);
+
     res.cookie('access_token', access_token, {
       secure:true,
       sameSite:'lax',
@@ -22,7 +23,7 @@ export class AuthController {
       maxAge:20 * 60 * 1000
     })
 
-    res.cookie('access_token', refresh_token, {
+    res.cookie('refresh_token', refresh_token, {
       secure:true,
       sameSite:'lax',
       httpOnly:true,
@@ -31,23 +32,31 @@ export class AuthController {
 
     return {
       user,
-      access_token
+      access_token,
+      refresh_token
     };
   }
 
   @Post('refresh')
   @UseGuards(JwtRefreshGuard)
-  async refresh(@GetUser() user:{id:number, refresh_token:string}){
-
-    return this.authService.refreshToken(user.id, user.refresh_token)
+  async refresh(@GetUser() user:{id:number, refreshToken:string}, @Res({passthrough:true}) res:ExpressResponse){
+    return this.authService.refreshToken(user.id, user.refreshToken, res)
   }
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   async logout(@GetUser('id') id:number, @Res({passthrough:true}) res:ExpressResponse){
-    await this.authService.logout(id)
-    res.clearCookie('access_token')
-    res.clearCookie('refresh_token');
+    await this.authService.logout(id,res)
+    res.clearCookie('access_token', {
+      httpOnly:true,
+      sameSite:'lax',
+      secure:true
+    })
+    res.clearCookie('refresh_token', {
+      httpOnly:true,
+      sameSite:'lax',
+      secure:true
+    });
 
   return { message: 'Successfully logged out' };
   }
