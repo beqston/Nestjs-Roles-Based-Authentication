@@ -1,30 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Request } from 'express';
+import { type Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
-
-export interface RequestWithRefreshToken extends Request {
-  rawRefreshToken?: string;
-}
-
-const extractRefreshToken = (req: RequestWithRefreshToken): string | null => {
-  if (req.rawRefreshToken) return req.rawRefreshToken;
-
-  const token =
-    req.cookies?.refresh_token ||
-    ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
-    req.body?.refreshToken ||
-    null;
-
-  if (token) {
-    req.rawRefreshToken = token; 
-  }
-
-  return token;
-};
+import { extractRefreshToken } from '../utils/extract-refresh-token.util';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
@@ -42,7 +23,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     });
   }
 
-  async validate(req: RequestWithRefreshToken, payload: JwtPayload) {
+  async validate(req: Request, payload: JwtPayload) {
     const refreshToken = extractRefreshToken(req);
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not provided');
@@ -62,7 +43,6 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
       id: payload.sub,      
       email: payload.email,
       role: payload.role,
-      refreshToken
     };
   }
 }
