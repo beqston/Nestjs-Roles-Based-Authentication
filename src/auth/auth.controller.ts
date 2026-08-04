@@ -1,4 +1,4 @@
-import { Controller, Headers, Post, Request, Res, Response, UseGuards } from '@nestjs/common';
+import { Controller, Headers, Post, Req, Request, Res, Response, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User } from '@prisma/client';
 import {type Request as ExpressRequest, type Response as ExpressResponse} from 'express'
@@ -39,8 +39,11 @@ export class AuthController {
 
   @Post('refresh')
   @UseGuards(JwtRefreshGuard)
-  async refresh(@GetUser() user:{id:number, refreshToken:string}, @Res({passthrough:true}) res:ExpressResponse){
-    return this.authService.refreshToken(user.id, user.refreshToken, res)
+  async refresh(@GetUser() user:{id:number}, @Req() req:ExpressRequest, @Res({passthrough:true}) res:ExpressResponse){
+    if (!req.refreshToken) {
+      throw new UnauthorizedException('Refresh token missing');
+    }
+    return this.authService.refreshToken(user.id, req.refreshToken, res)
   }
 
   @Post('logout')

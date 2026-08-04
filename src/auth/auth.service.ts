@@ -2,7 +2,6 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma.service';
-import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 import {type Response } from 'express';
 
@@ -73,7 +72,7 @@ export class AuthService {
 
     const payload = { sub: user.id, email: user.email, role:user.role };
     const newAccessToken = await this.jwtService.signAsync(payload);
-    const newRefreshToken = await this.jwtService.signAsync(payload, {expiresIn:'7d'}); 
+    const newRefreshToken = await this.jwtService.signAsync(payload, {expiresIn:'7d', secret: process.env.JWT_REFRESH_SECRET!}); 
     const newHashedRefreshToken = await bcrypt.hash(newRefreshToken, 10)
 
     await this.prisma.user.update({
